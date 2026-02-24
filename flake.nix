@@ -44,11 +44,11 @@
             
             extraPkgs = p: with p; [
               glib gtk3 cairo pango atk gdk-pixbuf
-              xorg.libX11 xorg.libXcomposite xorg.libXcursor
-              xorg.libXext xorg.libXfixes xorg.libXi
-              xorg.libXrandr xorg.libXrender xorg.libXtst
+              libX11 libXcomposite libXcursor
+              libXext libXfixes libXi
+              libXrandr libXrender libXtst
               nss nspr dbus at-spi2-atk at-spi2-core
-              mesa alsa-lib fuse libxkbcommon xorg.libxkbfile
+              mesa alsa-lib fuse libxkbcommon libxkbfile
             ];
           };
         in
