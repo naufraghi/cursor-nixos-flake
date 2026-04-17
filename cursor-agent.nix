@@ -25,7 +25,10 @@ pkgs.buildFHSEnv {
   runScript = pkgs.writeShellScript "cursor-agent-wrap" ''
     exec ${agentDist}/dist-package/cursor-agent "$@"
   '';
-  targetPkgs = pkgs: [ pkgs.stdenv.cc.cc.lib ];
+  targetPkgs = pkgs: [
+    pkgs.stdenv.cc.cc.lib
+    pkgs.zlib
+  ];
   meta = with pkgs.lib; {
     description = "Cursor Agent CLI (upstream lab build)";
     homepage = "https://cursor.com";
