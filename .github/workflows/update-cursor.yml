@@ -1,4 +1,4 @@
-name: Update Cursor Version
+name: Update Cursor (IDE + Agent)
 
 on:
   schedule:
@@ -10,72 +10,56 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Setup Nix
       uses: cachix/install-nix-action@v25
       with:
         nix_path: nixpkgs=channel:nixpkgs-unstable
-    
-    - name: Update Cursor using script
-      id: update-cursor
+
+    - name: Update Cursor IDE and Agent pins
+      id: update
       run: |
-        # Make the script executable
         chmod +x update-cursor.sh
-        
-        # Run the update script (it will auto-confirm in CI mode)
+        # No arguments: refresh both the AppImage (flake.nix) and agent CLI
+        # (cursor-agent-versions.nix) when upstream has newer builds.
         ./update-cursor.sh
-        
-        # Capture version info from script output
-        if [[ -f "$GITHUB_OUTPUT" ]]; then
-          grep "CURSOR_VERSION_INFO=" "$GITHUB_OUTPUT" || echo "CURSOR_VERSION_INFO=no_update" >> "$GITHUB_OUTPUT"
-        fi
-    
+
     - name: Update flake lock file
-      run: |
-        nix flake update
-    
+      if: steps.update.outputs.cursor_updates != 'none' && steps.update.outputs.cursor_updates != ''
+      run: nix flake update
+
     - name: Test the updated flake
+      if: steps.update.outputs.cursor_updates != 'none' && steps.update.outputs.cursor_updates != ''
       run: |
         nix flake check
-        nix build .#cursor --dry-run
-    
+        nix build '.#cursor' '.#cursor-agent' --dry-run
+
     - name: Commit and push changes
+      if: steps.update.outputs.cursor_updates != 'none' && steps.update.outputs.cursor_updates != ''
+      env:
+        SCOPE: ${{ steps.update.outputs.cursor_updates }}
       run: |
-        # Get version info from the update step
-        VERSION_INFO="${{ steps.update-cursor.outputs.CURSOR_VERSION_INFO }}"
-        
-        # Only commit if there was an actual update
-        if [[ "$VERSION_INFO" == "no_update" ]]; then
-          echo "No Cursor update needed, skipping commit"
+        case "$SCOPE" in
+          ide)   COMMIT_MSG="Update Cursor IDE (AppImage)" ;;
+          agent) COMMIT_MSG="Update Cursor Agent CLI (lab tarball)" ;;
+          both)  COMMIT_MSG="Update Cursor IDE and Agent CLI" ;;
+          *)     echo "Unexpected scope: $SCOPE"; exit 1 ;;
+        esac
+
+        git add flake.nix cursor-agent-versions.nix flake.lock
+        if git diff --cached --quiet; then
+          echo "No staged changes; nothing to commit"
           exit 0
         fi
-        
-        # Check if there are any changes to commit
-        if git diff --quiet; then
-          echo "No changes to commit"
-          exit 0
-        fi
-        
-        # Create commit message based on version info
-        if [[ "$VERSION_INFO" == completed:* ]]; then
-          # Extract version from format: completed:old_version:new_version
-          NEW_VERSION=$(echo "$VERSION_INFO" | cut -d: -f3)
-          COMMIT_MSG="Update Cursor to version $NEW_VERSION"
-        else
-          COMMIT_MSG="Update Cursor to latest version"
-        fi
-        
+
         echo "Commit message: $COMMIT_MSG"
-        
         git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add flake.nix flake.lock
+        git config --local user.name  "GitHub Action"
         git commit -m "$COMMIT_MSG"
         git push
-    

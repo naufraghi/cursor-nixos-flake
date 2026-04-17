@@ -1,5 +1,5 @@
 {
-  description = "Cursor AppImage package flake";
+  description = "Cursor IDE (AppImage) and Cursor Agent CLI (lab tarball) flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -23,6 +23,11 @@
           sha256 = "0l8jyzask2k5a4xdcz7h5vj9f4rz39b51142akfhkx6s7j0fdich";
         };
       };
+
+      agentVersions = import ./cursor-agent-versions.nix;
+
+      buildCursorAgent = { pkgs, system }:
+        import ./cursor-agent.nix { inherit pkgs agentVersions system; };
       
       buildCursor = { pkgs, system }: 
         let
@@ -127,12 +132,33 @@
         in {
           default = self.packages.${system}.cursor;
           cursor = buildCursor { inherit pkgs system; };
+          cursor-agent = buildCursorAgent { inherit pkgs system; };
         }
       );
+
+      apps = forAllSystems (system: {
+        default = {
+          type = "app";
+          program = "${self.packages.${system}.cursor}/bin/cursor";
+        };
+        cursor = {
+          type = "app";
+          program = "${self.packages.${system}.cursor}/bin/cursor";
+        };
+        cursor-agent = {
+          type = "app";
+          program = "${self.packages.${system}.cursor-agent}/bin/cursor-agent";
+        };
+      });
+
+      checks = forAllSystems (system: {
+        inherit (self.packages.${system}) cursor cursor-agent;
+      });
 
       # Overlay for easy integration into other flakes
       overlays.default = final: prev: {
         cursor = self.packages.${prev.system}.cursor;
+        cursor-agent = self.packages.${prev.system}.cursor-agent;
       };
     };
 }
