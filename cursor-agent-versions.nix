@@ -1,13 +1,13 @@
 {
-  labVersion = "2026.09.02-c22c1a3";
+  labVersion = "2026.09.08-6caf4ff";
   sources = {
     x86_64-linux = {
-      url = "https://downloads.cursor.com/lab/2026.09.02-c22c1a3/linux/x64/agent-cli-package.tar.gz";
-      sha256 = "0g7ma23y8arn1bb8h429a6l5d8xmqd8wqz0dq87mqlv28y2mjfxp";
+      url = "https://downloads.cursor.com/lab/2026.09.08-6caf4ff/linux/x64/agent-cli-package.tar.gz";
+      sha256 = "07hzp2d1h7q46svdhv3q5d2a7igvd7vi9k055nwvhlmn07fi2yhd";
     };
     aarch64-linux = {
-      url = "https://downloads.cursor.com/lab/2026.09.02-c22c1a3/linux/arm64/agent-cli-package.tar.gz";
-      sha256 = "0k48jw4njrnvgxnmqi8n36jlsqg32y9gs1zrd37ynwk1pqswcyzv";
+      url = "https://downloads.cursor.com/lab/2026.09.08-6caf4ff/linux/arm64/agent-cli-package.tar.gz";
+      sha256 = "0wdafzzz1pk9znmngf7hbm74wgh7pima5wj4sm44g0chvf1f2fhm";
     };
   };
 }
