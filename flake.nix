@@ -11,16 +11,16 @@
       
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       
-      version = "3.24.12";
+      version = "3.24.18";
       
       sources = {
         x86_64-linux = {
-          url = "https://downloads.cursor.com/production/37b865941ccb31e2fc90c685157534efca87f964/linux/x64/Cursor-3.24.12-x86_64.AppImage";
-          sha256 = "0din8h861sqp3bhmj0gpsp5ggqfs3jpy3y1ya9nfdbmd6x1gn295";
+          url = "https://downloads.cursor.com/production/be4c9e5350d77747b42cd467cbd3370a753d464b/linux/x64/Cursor-3.24.18-x86_64.AppImage";
+          sha256 = "13m2bdjlyyrisnsby8vbm8b46992cslsdfrv3y3a55lhl4z7vv84";
         };
         aarch64-linux = {
-          url = "https://downloads.cursor.com/production/37b865941ccb31e2fc90c685157534efca87f964/linux/arm64/Cursor-3.24.12-aarch64.AppImage";
-          sha256 = "0zp2kz1znjdn4lghacyy2zx3vgaq2zjf284ms1xsdrfla29gv87w";
+          url = "https://downloads.cursor.com/production/be4c9e5350d77747b42cd467cbd3370a753d464b/linux/arm64/Cursor-3.24.18-aarch64.AppImage";
+          sha256 = "02bnnb572p9cqyif7gmd3ll86v2c97g0wk4np4q5md8wanwnsqh7";
         };
       };
 
